@@ -1,0 +1,8 @@
+set(SOURCE_FILES
+  main.cpp
+)
+
+add_executable(${CMAKE_PROJECT_NAME} ${SOURCE_FILES})
+set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES
+  RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/bin"
+)
