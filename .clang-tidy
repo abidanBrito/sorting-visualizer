@@ -1,0 +1,31 @@
+---
+Checks: "
+cppcoreguidelines-*,
+clang-analyzer-*,
+bugprone-*,
+modernize-*,
+performance-*,
+readability-*,
+portability-*,
+misc-*,
+-cppcoreguidelines-avoid-magic-numbers,
+-bugprone-easily-swappable-parameters,
+-performance-avoid-endl,
+-readability-magic-numbers,
+-readability-identifier-length,
+-readability-uppercase-literal-suffix,
+-readability-function-cognitive-complexity,
+-readability-braces-around-statements,
+-readability-avoid-nested-conditional-expression,
+-readability-avoid-nested-conditional-operator,
+-misc-non-private-member-variables-in-classes,
+-llvmlibc-*,
+-fuchsia-*,
+-android-*,
+-altera-*,
+-zircon-*,
+"
+WarningsAsErrors: false
+HeaderFilterRegex: '^[^/].*\.(h|hpp)$'
+FormatStyle: none
+...
