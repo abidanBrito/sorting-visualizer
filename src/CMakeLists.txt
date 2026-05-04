@@ -1,5 +1,6 @@
 set(SOURCE_FILES
   main.cpp
+  visualizer.cpp
 )
 
 add_executable(${CMAKE_PROJECT_NAME} ${SOURCE_FILES})

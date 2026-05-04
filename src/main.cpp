@@ -1,8 +1,7 @@
-#include <iostream>
+#include "visualizer.hpp"
 
 auto main() -> int
 {
-    std::cout << "Hey there!\n";
-
-    return 0;
+    SortingVisualizer sorting_visualizer {};
+    sorting_visualizer.run();
 }
