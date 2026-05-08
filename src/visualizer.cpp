@@ -23,21 +23,27 @@ auto SortingVisualizer::run() -> void
 {
     while (!WindowShouldClose())
     {
-        PollInputEvents();
-
-        if (!algorithm_->is_done())
-        {
-            algorithm_->step(elements_);
-        }
-
-        BeginDrawing();
-        ClearBackground(Color { .r = 55, .g = 55, .b = 55, .a = 255 });
+        update();
         draw();
-        EndDrawing();
     }
 }
 
+auto SortingVisualizer::update() -> void
+{
+    PollInputEvents();
+    if (!algorithm_->is_done()) algorithm_->step(elements_);
+}
+
 auto SortingVisualizer::draw() const -> void
+{
+    BeginDrawing();
+    ClearBackground(Color { .r = 55, .g = 55, .b = 55, .a = 255 });
+    draw_bars();
+    draw_title();
+    EndDrawing();
+}
+
+auto SortingVisualizer::draw_bars() const -> void
 {
     const auto full_width = static_cast<float>(window_width);
     const auto full_height = static_cast<float>(window_height);
@@ -50,7 +56,7 @@ auto SortingVisualizer::draw() const -> void
 
     for (size_t i {}; i < num_elements; i++)
     {
-        const float height { 0.9f * full_height * elements_[i] };
+        const float height { bar_max_window_height * full_height * elements_[i] };
         const bool is_compared { i == compared.first || i == compared.second };
 
         const Color top_color = done          ? Color { .r = 180, .g = 220, .b = 180, .a = 255 }
@@ -65,4 +71,14 @@ auto SortingVisualizer::draw() const -> void
                                static_cast<int>(full_height - height), static_cast<int>(bar_width),
                                static_cast<int>(height), top_color, bottom_color);
     }
+}
+
+auto SortingVisualizer::draw_title() const -> void
+{
+    const std::string name { algorithm_->get_name() };
+    constexpr int font_size { 24 };
+    const int text_width { MeasureText(name.c_str(), font_size) };
+
+    DrawText(name.c_str(), (window_width - text_width) / 2, (header_height - font_size) / 2,
+             font_size, Color { .r = 230, .g = 230, .b = 230, .a = 255 });
 }
