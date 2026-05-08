@@ -16,7 +16,7 @@ private:
     static constexpr int window_width { 800 };
     static constexpr int window_height { 600 };
     static constexpr int num_elements { 100 };
-    static constexpr float bar_gap { 0.1f };
+    static constexpr float bar_gap { 0.15f };
 
     std::vector<float> elements_;
     std::pair<size_t, size_t> compared_;
