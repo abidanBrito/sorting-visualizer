@@ -48,7 +48,8 @@ auto SortingVisualizer::draw_bars() const -> void
     const auto full_width = static_cast<float>(window_width);
     const auto full_height = static_cast<float>(window_height);
 
-    const float x_step { full_width / static_cast<float>(num_elements) };
+    const float available_width { full_width - (2.0f * side_margin) };
+    const float x_step { available_width / static_cast<float>(num_elements) };
     const float bar_width { x_step * (1.0f - bar_gap) };
 
     const auto compared { algorithm_->compared_indices() };
@@ -72,7 +73,7 @@ auto SortingVisualizer::draw_bars() const -> void
                                    : is_compared ? Color { .r = 200, .g = 60, .b = 180, .a = 255 }
                                                  : Color { .r = 180, .g = 160, .b = 210, .a = 255 };
 
-        DrawRectangleGradientV(static_cast<int>(x_step * static_cast<float>(i)),
+        DrawRectangleGradientV(static_cast<int>(side_margin + (x_step * static_cast<float>(i))),
                                static_cast<int>(full_height - height), static_cast<int>(bar_width),
                                static_cast<int>(height), top_color, bottom_color);
     }

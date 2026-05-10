@@ -23,6 +23,7 @@ private:
     static constexpr int num_elements { 100 };
     static constexpr float bar_max_window_height { 0.85f };
     static constexpr float bar_gap { 0.15f };
+    static constexpr float side_margin { 5.0f };
     static constexpr int header_height { 80 };
 
     std::unique_ptr<SortAlgorithm> algorithm_;
