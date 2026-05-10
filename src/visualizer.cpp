@@ -1,11 +1,11 @@
 #include "visualizer.hpp"
-#include "algorithms/selection_sort.hpp"
+#include "algorithms/bubble_sort.hpp"
 
 #include <raylib.h>
 #include <random>
 
 SortingVisualizer::SortingVisualizer()
-    : algorithm_ { std::make_unique<SelectionSort>() }
+    : algorithm_ { std::make_unique<BubbleSort>() }
 {
     InitWindow(window_width, window_height, "Sorting Algorithms Visualizer");
     SetTargetFPS(30);
