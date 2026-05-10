@@ -49,7 +49,7 @@ auto SortingVisualizer::draw_bars() const -> void
     const auto full_height = static_cast<float>(window_height);
 
     const float x_step { full_width / static_cast<float>(num_elements) };
-    const float bar_width { x_step - bar_gap };
+    const float bar_width { x_step * (1.0f - bar_gap) };
 
     const auto compared { algorithm_->compared_indices() };
     const auto swapped { algorithm_->swapped_indices() };
