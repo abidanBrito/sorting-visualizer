@@ -13,7 +13,7 @@ BreakBeforeBinaryOperators: NonAssignment
 BreakBeforeTernaryOperators: true
 AlwaysBreakTemplateDeclarations: Yes
 PackConstructorInitializers: Never
-SeparateDefinitionBlocks: Always
+SeparateDefinitionBlocks: Leave
 Cpp11BracedListStyle: false
 SpaceBeforeCpp11BracedList: true
 SpaceAfterTemplateKeyword: true
@@ -29,4 +29,5 @@ IncludeBlocks: Regroup
 SortIncludes: false
 AllowAllParametersOfDeclarationOnNextLine: false
 AllowShortIfStatementsOnASingleLine: WithoutElse
+AllowShortFunctionsOnASingleLine: Inline
 ...
