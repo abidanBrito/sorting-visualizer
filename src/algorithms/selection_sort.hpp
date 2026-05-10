@@ -7,12 +7,14 @@ class SelectionSort : public SortAlgorithm
 public:
     auto step(std::vector<float>& elements) -> void override;
     auto reset() -> void override;
-    [[nodiscard]] auto get_compared() const -> std::pair<size_t, size_t> override;
-    [[nodiscard]] auto get_name() const -> std::string_view override;
-    [[nodiscard]] auto is_done() const -> bool override;
+
+    [[nodiscard]] auto compared_indices() const -> std::set<size_t> override;
+    [[nodiscard]] auto swapped_indices() const -> std::set<size_t> override;
+    [[nodiscard]] auto name() const -> std::string_view override { return "Selection Sort"; }
 
 private:
-    std::pair<size_t, size_t> compared_;
+    std::set<size_t> last_compared_;
+    bool last_was_swap_ { false };
     size_t right_marker_ { 0 };
-    bool done_ { false };
+    size_t last_min_idx_ { 0 };
 };
