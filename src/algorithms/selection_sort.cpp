@@ -20,6 +20,8 @@ auto SelectionSort::step(std::vector<float>& elements) -> void
     }
 
     right_marker_++;
+    sorted_.insert(right_marker_ - 1);
+
     if (right_marker_ >= elements.size()) mark_done();
 }
 
@@ -27,6 +29,7 @@ auto SelectionSort::reset() -> void
 {
     reset_done();
     last_compared_.clear();
+    sorted_.clear();
     last_was_swap_ = false;
     right_marker_ = 0;
 }
@@ -41,4 +44,9 @@ auto SelectionSort::swapped_indices() const -> std::set<size_t>
 {
     if (last_was_swap_) return { last_min_idx_ };
     return {};
+}
+
+auto SelectionSort::sorted_indices() const -> std::set<size_t>
+{
+    return sorted_;
 }

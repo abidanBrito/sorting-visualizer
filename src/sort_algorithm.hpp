@@ -21,6 +21,7 @@ public:
 
     [[nodiscard]] virtual auto compared_indices() const -> std::set<size_t> = 0;
     [[nodiscard]] virtual auto swapped_indices() const -> std::set<size_t> = 0;
+    [[nodiscard]] virtual auto sorted_indices() const -> std::set<size_t> = 0;
     [[nodiscard]] virtual auto name() const -> std::string_view = 0;
 
     [[nodiscard]] auto is_done() const -> bool { return done_; }

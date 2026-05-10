@@ -22,6 +22,8 @@ auto BubbleSort::step(std::vector<float>& elements) -> void
         cursor_ = 0;
         sweep_count_++;
 
+        sorted_.insert(num_elements - sweep_count_);
+
         if (sweep_count_ >= num_elements - 1) mark_done();
     }
 }
@@ -30,6 +32,7 @@ auto BubbleSort::reset() -> void
 {
     reset_done();
     last_compared_.clear();
+    sorted_.clear();
     last_was_swap_ = false;
     sweep_count_ = 0;
     cursor_ = 0;
@@ -45,4 +48,9 @@ auto BubbleSort::swapped_indices() const -> std::set<size_t>
 {
     if (last_was_swap_) return last_compared_;
     return {};
+}
+
+auto BubbleSort::sorted_indices() const -> std::set<size_t>
+{
+    return sorted_;
 }

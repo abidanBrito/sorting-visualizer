@@ -53,22 +53,23 @@ auto SortingVisualizer::draw_bars() const -> void
 
     const auto compared { algorithm_->compared_indices() };
     const auto swapped { algorithm_->swapped_indices() };
-    const bool done { algorithm_->is_done() };
+    const std::set<size_t> sorted { algorithm_->sorted_indices() };
 
     for (size_t i {}; i < num_elements; i++)
     {
         const float height { bar_max_window_height * full_height * elements_[i] };
         const bool is_compared { compared.contains(i) };
         const bool is_swapped { swapped.contains(i) };
+        const bool is_sorted { sorted.contains(i) };
 
-        const Color top_color = done          ? Color { .r = 180, .g = 220, .b = 180, .a = 255 }
-                                : is_swapped  ? Color { .r = 255, .g = 200, .b = 120, .a = 255 }
-                                : is_compared ? Color { .r = 220, .g = 180, .b = 255, .a = 255 }
-                                              : WHITE;
+        const Color top_color = is_sorted     ? Color { .r = 120, .g = 220, .b = 210, .a = 255 }
+                                : is_swapped  ? Color { .r = 220, .g = 180, .b = 255, .a = 255 }
+                                : is_compared ? Color { .r = 255, .g = 120, .b = 220, .a = 255 }
+                                              : Color { .r = 200, .g = 195, .b = 215, .a = 255 };
 
-        const Color bottom_color = done          ? Color { .r = 120, .g = 160, .b = 130, .a = 255 }
-                                   : is_swapped  ? Color { .r = 220, .g = 140, .b = 60, .a = 255 }
-                                   : is_compared ? Color { .r = 140, .g = 80, .b = 200, .a = 255 }
+        const Color bottom_color = is_sorted     ? Color { .r = 60, .g = 160, .b = 150, .a = 255 }
+                                   : is_swapped  ? Color { .r = 140, .g = 80, .b = 200, .a = 255 }
+                                   : is_compared ? Color { .r = 200, .g = 60, .b = 180, .a = 255 }
                                                  : Color { .r = 180, .g = 160, .b = 210, .a = 255 };
 
         DrawRectangleGradientV(static_cast<int>(x_step * static_cast<float>(i)),
