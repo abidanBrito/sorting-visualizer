@@ -1,6 +1,9 @@
 #include "visualizer.hpp"
 #include "algorithms/selection_sort.hpp"
 
+#define RAYGUI_IMPLEMENTATION
+#include "raygui.h"
+
 #include <raylib.h>
 #include <random>
 
@@ -30,16 +33,21 @@ auto SortingVisualizer::run() -> void
 
 auto SortingVisualizer::update() -> void
 {
-    PollInputEvents();
-    if (!algorithm_->is_done()) algorithm_->step(elements_);
+    if (!dropdown_edit_mode_)
+    {
+        const int steps { speed_multipliers.at(dropdown_active_) };
+        for (size_t i {}; i < steps && !algorithm_->is_done(); i++)
+            algorithm_->step(elements_);
+    }
 }
 
-auto SortingVisualizer::draw() const -> void
+auto SortingVisualizer::draw() -> void
 {
     BeginDrawing();
     ClearBackground(Color { .r = 55, .g = 55, .b = 55, .a = 255 });
     draw_bars();
     draw_title();
+    draw_ui();
     EndDrawing();
 }
 
@@ -82,9 +90,17 @@ auto SortingVisualizer::draw_bars() const -> void
 auto SortingVisualizer::draw_title() const -> void
 {
     const std::string name { algorithm_->name() };
-    constexpr int font_size { 24 };
+    static constexpr int font_size { 24 };
     const int text_width { MeasureText(name.c_str(), font_size) };
 
     DrawText(name.c_str(), (window_width - text_width) / 2, (header_height - font_size) / 2,
              font_size, Color { .r = 230, .g = 230, .b = 230, .a = 255 });
+}
+
+auto SortingVisualizer::draw_ui() -> void
+{
+    static constexpr Rectangle bounds { .x = 30, .y = 30, .width = 80, .height = 25 };
+
+    if (GuiDropdownBox(bounds, "1x;5x;10x;100x", &dropdown_active_, dropdown_edit_mode_) != 0)
+        dropdown_edit_mode_ = !dropdown_edit_mode_;
 }

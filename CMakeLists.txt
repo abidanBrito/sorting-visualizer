@@ -31,4 +31,22 @@ if (NOT raylib_FOUND)
   endif()
 endif()
 
+set(RAYGUI_VERSION 4.0)
+find_package(raygui ${RAYGUI_VERSION} QUIET)
+
+if (NOT raygui_FOUND)
+  include(FetchContent)
+  FetchContent_Declare(
+    raygui
+    DOWNLOAD_EXTRACT_TIMESTAMP OFF
+    URL https://github.com/raysan5/raygui/archive/refs/tags/${RAYGUI_VERSION}.tar.gz
+  )
+  FetchContent_GetProperties(raygui)
+
+  if (NOT raygui_POPULATED)
+    set(FETCHCONTENT_QUIET OFF)
+    FetchContent_MakeAvailable(raygui)
+  endif()
+endif()
+
 add_subdirectory(src)
