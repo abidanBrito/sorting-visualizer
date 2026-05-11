@@ -15,6 +15,7 @@ public:
 
 private:
     auto update() -> void;
+    auto reset() -> void;
     auto draw() -> void;
     auto draw_bars() const -> void;
     auto draw_title() const -> void;
@@ -30,6 +31,7 @@ private:
     static constexpr std::array<int, 4> speed_multipliers { 1, 5, 10, 100 };
 
     std::unique_ptr<SortAlgorithm> algorithm_;
+    std::vector<float> original_elements_;
     std::vector<float> elements_;
 
     int dropdown_active_ { 0 };

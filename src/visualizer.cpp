@@ -18,7 +18,10 @@ SortingVisualizer::SortingVisualizer()
 
     for (size_t i {}; i < num_elements; i++)
     {
-        elements_.push_back(range(rng));
+        const float value { range(rng) };
+
+        original_elements_.push_back(value);
+        elements_.push_back(value);
     }
 }
 
@@ -41,13 +44,21 @@ auto SortingVisualizer::update() -> void
     }
 }
 
+auto SortingVisualizer::reset() -> void
+{
+    elements_ = original_elements_;
+    algorithm_->reset();
+}
+
 auto SortingVisualizer::draw() -> void
 {
     BeginDrawing();
     ClearBackground(Color { .r = 55, .g = 55, .b = 55, .a = 255 });
+
     draw_bars();
     draw_title();
     draw_ui();
+
     EndDrawing();
 }
 
@@ -99,8 +110,14 @@ auto SortingVisualizer::draw_title() const -> void
 
 auto SortingVisualizer::draw_ui() -> void
 {
-    static constexpr Rectangle bounds { .x = 30, .y = 30, .width = 80, .height = 25 };
+    static constexpr Rectangle reset_button_bounds { .x = 30, .y = 30, .width = 75, .height = 25 };
+    if (GuiButton(reset_button_bounds, "Reset") != 0) reset();
 
-    if (GuiDropdownBox(bounds, "1x;5x;10x;100x", &dropdown_active_, dropdown_edit_mode_) != 0)
+    static constexpr Rectangle speed_multiplier_dropdown_bounds {
+        .x = 120, .y = 30, .width = 75, .height = 25
+    };
+    if (GuiDropdownBox(speed_multiplier_dropdown_bounds, "1x;5x;10x;100x", &dropdown_active_,
+                       dropdown_edit_mode_)
+        != 0)
         dropdown_edit_mode_ = !dropdown_edit_mode_;
 }
