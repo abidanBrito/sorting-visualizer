@@ -34,6 +34,7 @@ private:
     std::vector<float> original_elements_;
     std::vector<float> elements_;
 
-    int dropdown_active_ { 0 };
+    int dropdown_active_item_ { 0 };
     bool dropdown_edit_mode_ { false };
+    bool paused_ { false };
 };

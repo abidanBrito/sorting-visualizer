@@ -36,10 +36,10 @@ auto SortingVisualizer::run() -> void
 
 auto SortingVisualizer::update() -> void
 {
-    if (!dropdown_edit_mode_)
+    if (!dropdown_edit_mode_ && !paused_)
     {
-        const int steps { speed_multipliers.at(dropdown_active_) };
-        for (size_t i {}; i < steps && !algorithm_->is_done(); i++)
+        const int sort_steps { speed_multipliers.at(dropdown_active_item_) };
+        for (size_t i {}; i < sort_steps && !algorithm_->is_done(); i++)
             algorithm_->step(elements_);
     }
 }
@@ -47,6 +47,7 @@ auto SortingVisualizer::update() -> void
 auto SortingVisualizer::reset() -> void
 {
     elements_ = original_elements_;
+    paused_ = false;
     algorithm_->reset();
 }
 
@@ -110,13 +111,16 @@ auto SortingVisualizer::draw_title() const -> void
 
 auto SortingVisualizer::draw_ui() -> void
 {
-    static constexpr Rectangle reset_button_bounds { .x = 30, .y = 30, .width = 75, .height = 25 };
+    static constexpr Rectangle play_button_bounds { .x = 30, .y = 30, .width = 75, .height = 25 };
+    if (GuiButton(play_button_bounds, paused_ ? "Play" : "Stop") != 0) paused_ = !paused_;
+
+    static constexpr Rectangle reset_button_bounds { .x = 30, .y = 65, .width = 75, .height = 25 };
     if (GuiButton(reset_button_bounds, "Reset") != 0) reset();
 
     static constexpr Rectangle speed_multiplier_dropdown_bounds {
-        .x = 120, .y = 30, .width = 75, .height = 25
+        .x = 115, .y = 30, .width = 75, .height = 25
     };
-    if (GuiDropdownBox(speed_multiplier_dropdown_bounds, "1x;5x;10x;100x", &dropdown_active_,
+    if (GuiDropdownBox(speed_multiplier_dropdown_bounds, "1x;5x;10x;100x", &dropdown_active_item_,
                        dropdown_edit_mode_)
         != 0)
         dropdown_edit_mode_ = !dropdown_edit_mode_;
