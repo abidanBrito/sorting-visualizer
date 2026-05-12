@@ -47,7 +47,7 @@ private:
     static constexpr int pane_margin { 10 };
     static constexpr float bar_max_pane_height { 0.85f };
     static constexpr float bar_gap { 0.1f };
-    static constexpr int font_size { 20 };
+    static constexpr int font_size { 16 };
 
     static constexpr std::array<int, 4> speed_multipliers { 1, 5, 10, 100 };
 
