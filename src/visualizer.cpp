@@ -9,19 +9,28 @@
 
 SortingVisualizer::SortingVisualizer()
 {
-    ui_panes_[0].algorithm = std::make_unique<SelectionSort>();
-    ui_panes_[0].speed_multiplier_idx = 0;
-    ui_panes_[0].rectangle = Rectangle { .x = 0,
-                                         .y = ui_top_bar_height,
-                                         .width = window_width / 2.0f,
-                                         .height = window_height - ui_top_bar_height };
+    panes_[0].algorithm = std::make_unique<SelectionSort>();
+    panes_[1].algorithm = std::make_unique<BubbleSort>();
+    panes_[2].algorithm = std::make_unique<SelectionSort>();
+    panes_[3].algorithm = std::make_unique<BubbleSort>();
+    panes_[4].algorithm = std::make_unique<SelectionSort>();
+    panes_[5].algorithm = std::make_unique<BubbleSort>();
 
-    ui_panes_[1].algorithm = std::make_unique<BubbleSort>();
-    ui_panes_[1].speed_multiplier_idx = 0;
-    ui_panes_[1].rectangle = Rectangle { .x = window_width / 2.0f,
-                                         .y = ui_top_bar_height,
-                                         .width = window_width / 2.0f,
-                                         .height = window_height - ui_top_bar_height };
+    const float pane_width = static_cast<float>(window_width) / num_panes_per_row;
+    const float pane_height = static_cast<float>(window_height - ui_top_bar_height) / num_rows;
+
+    for (size_t i {}; i < num_panes; i++)
+    {
+        const size_t row = i / num_panes_per_row;
+        const size_t col = i % num_panes_per_row;
+
+        panes_.at(i).speed_multiplier_idx = 0;
+        panes_.at(i).rectangle =
+            Rectangle { .x = static_cast<float>(col) * pane_width,
+                        .y = ui_top_bar_height + (static_cast<float>(row) * pane_height),
+                        .width = pane_width,
+                        .height = pane_height };
+    }
 
     InitWindow(window_width, window_height, "Sorting Algorithms Visualizer");
     SetTargetFPS(30);
@@ -34,7 +43,9 @@ SortingVisualizer::SortingVisualizer()
         const float value { range(rng) };
 
         original_elements_.push_back(value);
-        elements_.push_back(value);
+
+        for (auto& pane : panes_)
+            pane.elements.push_back(value);
     }
 }
 
@@ -49,13 +60,13 @@ auto SortingVisualizer::run() -> void
 
 auto SortingVisualizer::update() -> void
 {
-    if (!paused_ && !ui_edit_mode_)
+    if (!paused_)
     {
-        for (auto& pane : ui_panes_)
+        for (auto& pane : panes_)
         {
             const int sort_steps = speed_multipliers.at(pane.speed_multiplier_idx);
             for (size_t i {}; i < sort_steps && !pane.algorithm->is_done(); i++)
-                pane.algorithm->step(elements_);
+                pane.algorithm->step(pane.elements);
         }
     }
 
@@ -64,10 +75,11 @@ auto SortingVisualizer::update() -> void
 
 auto SortingVisualizer::reset() -> void
 {
-    elements_ = original_elements_;
-
-    for (auto& pane : ui_panes_)
+    for (auto& pane : panes_)
+    {
         pane.algorithm->reset();
+        pane.elements = original_elements_;
+    }
 }
 
 auto SortingVisualizer::draw() -> void
@@ -75,13 +87,13 @@ auto SortingVisualizer::draw() -> void
     BeginDrawing();
     ClearBackground(Color { .r = 40, .g = 40, .b = 40, .a = 255 });
 
-    for (auto& pane : ui_panes_)
+    for (auto& pane : panes_)
         draw_pane(pane);
 
     EndDrawing();
 }
 
-auto SortingVisualizer::draw_pane(const Pane& pane) const -> void
+auto SortingVisualizer::draw_pane(const Pane& pane) -> void
 {
     Rectangle rect = pane.rectangle;
     rect.x += pane_margin;
@@ -124,7 +136,7 @@ auto SortingVisualizer::draw_pane(const Pane& pane) const -> void
                                                  : Color { .r = 180, .g = 160, .b = 210, .a = 255 };
 
         const float drawable_height { rect.height - (2.0f * pane_padding) };
-        const float bar_height { bar_max_pane_height * drawable_height * elements_[i] };
+        const float bar_height { bar_max_pane_height * drawable_height * pane.elements[i] };
         const float bar_x = rect.x + pane_padding + (x_step * static_cast<float>(i));
         const float bar_y = rect.y + rect.height - pane_padding - bar_height;
 
@@ -161,7 +173,7 @@ auto SortingVisualizer::draw_ui() -> void
     if (GuiButton(play_button_bounds, paused_ ? "Play" : "Pause") != 0) paused_ = !paused_;
     if (GuiButton(reset_button_bounds, "Reset") != 0) reset();
 
-    for (auto& pane : ui_panes_)
+    for (auto& pane : panes_)
     {
         Rectangle rect = pane.rectangle;
 

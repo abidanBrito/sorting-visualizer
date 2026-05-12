@@ -12,6 +12,7 @@
 struct Pane
 {
     std::unique_ptr<SortAlgorithm> algorithm;
+    std::vector<float> elements;
     Rectangle rectangle;
     bool speed_dropdown_edit_mode { false };
     int speed_multiplier_idx { 0 };
@@ -29,11 +30,17 @@ private:
     auto reset() -> void;
     auto draw() -> void;
     auto draw_ui() -> void;
-    auto draw_pane(const Pane& pane) const -> void;
+
+    static auto draw_pane(const Pane& pane) -> void;
 
     static constexpr int window_width { 1280 };
     static constexpr int window_height { 720 };
+
     static constexpr int num_elements { 40 };
+    static constexpr int num_panes { 6 };
+    static constexpr int num_panes_per_row { 3 };
+    static constexpr int num_rows { num_panes / num_panes_per_row };
+
     static constexpr int ui_top_bar_height { 50 };
     static constexpr int pane_title_top_margin { 25 };
     static constexpr int pane_padding { 5 };
@@ -41,12 +48,10 @@ private:
     static constexpr float bar_max_pane_height { 0.85f };
     static constexpr float bar_gap { 0.1f };
     static constexpr int font_size { 20 };
+
     static constexpr std::array<int, 4> speed_multipliers { 1, 5, 10, 100 };
 
     std::vector<float> original_elements_;
-    std::vector<float> elements_;
-
-    std::array<Pane, 2> ui_panes_;
-    bool ui_edit_mode_ { false };
+    std::array<Pane, num_panes> panes_;
     bool paused_ { false };
 };
