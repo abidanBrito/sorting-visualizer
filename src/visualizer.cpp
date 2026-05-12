@@ -1,15 +1,28 @@
 #include "visualizer.hpp"
 #include "algorithms/selection_sort.hpp"
+#include "algorithms/bubble_sort.hpp"
 
 #define RAYGUI_IMPLEMENTATION
-#include "raygui.h"
+#include <raygui.h>
 
-#include <raylib.h>
 #include <random>
 
 SortingVisualizer::SortingVisualizer()
-    : algorithm_ { std::make_unique<SelectionSort>() }
 {
+    ui_panes_[0].algorithm = std::make_unique<SelectionSort>();
+    ui_panes_[0].speed_multiplier_idx = 0;
+    ui_panes_[0].rectangle = Rectangle { .x = 0,
+                                         .y = ui_top_bar_height,
+                                         .width = window_width / 2.0f,
+                                         .height = window_height - ui_top_bar_height };
+
+    ui_panes_[1].algorithm = std::make_unique<BubbleSort>();
+    ui_panes_[1].speed_multiplier_idx = 0;
+    ui_panes_[1].rectangle = Rectangle { .x = window_width / 2.0f,
+                                         .y = ui_top_bar_height,
+                                         .width = window_width / 2.0f,
+                                         .height = window_height - ui_top_bar_height };
+
     InitWindow(window_width, window_height, "Sorting Algorithms Visualizer");
     SetTargetFPS(30);
 
@@ -36,49 +49,66 @@ auto SortingVisualizer::run() -> void
 
 auto SortingVisualizer::update() -> void
 {
-    if (!dropdown_edit_mode_ && !paused_)
+    if (!paused_ && !ui_edit_mode_)
     {
-        const int sort_steps { speed_multipliers.at(dropdown_active_item_) };
-        for (size_t i {}; i < sort_steps && !algorithm_->is_done(); i++)
-            algorithm_->step(elements_);
+        for (auto& pane : ui_panes_)
+        {
+            const int sort_steps = speed_multipliers.at(pane.speed_multiplier_idx);
+            for (size_t i {}; i < sort_steps && !pane.algorithm->is_done(); i++)
+                pane.algorithm->step(elements_);
+        }
     }
+
+    draw_ui();
 }
 
 auto SortingVisualizer::reset() -> void
 {
     elements_ = original_elements_;
-    paused_ = false;
-    algorithm_->reset();
+
+    for (auto& pane : ui_panes_)
+        pane.algorithm->reset();
 }
 
 auto SortingVisualizer::draw() -> void
 {
     BeginDrawing();
-    ClearBackground(Color { .r = 55, .g = 55, .b = 55, .a = 255 });
+    ClearBackground(Color { .r = 40, .g = 40, .b = 40, .a = 255 });
 
-    draw_bars();
-    draw_title();
-    draw_ui();
+    for (auto& pane : ui_panes_)
+        draw_pane(pane);
 
     EndDrawing();
 }
 
-auto SortingVisualizer::draw_bars() const -> void
+auto SortingVisualizer::draw_pane(const Pane& pane) const -> void
 {
-    const auto full_width = static_cast<float>(window_width);
-    const auto full_height = static_cast<float>(window_height);
+    Rectangle rect = pane.rectangle;
+    rect.x += pane_margin;
+    rect.y += pane_margin;
+    rect.width -= 2 * pane_margin;
+    rect.height -= 2 * pane_margin;
 
-    const float available_width { full_width - (2.0f * side_margin) };
+    DrawRectangleLinesEx(rect, 2.0f, Color { .r = 200, .g = 200, .b = 200, .a = 255 });
+
+    const std::string name { pane.algorithm->name() };
+    const int name_width { MeasureText(name.c_str(), font_size) };
+
+    DrawText(name.c_str(),
+             static_cast<int>(rect.x + ((rect.width - static_cast<float>(name_width)) / 2)),
+             static_cast<int>(rect.y + pane_padding + pane_title_top_margin), font_size,
+             Color { .r = 230, .g = 230, .b = 230, .a = 255 });
+
+    const float available_width { rect.width - (2.0f * pane_padding) };
     const float x_step { available_width / static_cast<float>(num_elements) };
     const float bar_width { x_step * (1.0f - bar_gap) };
 
-    const auto compared { algorithm_->compared_indices() };
-    const auto swapped { algorithm_->swapped_indices() };
-    const std::set<size_t> sorted { algorithm_->sorted_indices() };
+    const auto compared { pane.algorithm->compared_indices() };
+    const auto swapped { pane.algorithm->swapped_indices() };
+    const auto sorted { pane.algorithm->sorted_indices() };
 
     for (size_t i {}; i < num_elements; i++)
     {
-        const float height { bar_max_window_height * full_height * elements_[i] };
         const bool is_compared { compared.contains(i) };
         const bool is_swapped { swapped.contains(i) };
         const bool is_sorted { sorted.contains(i) };
@@ -93,35 +123,58 @@ auto SortingVisualizer::draw_bars() const -> void
                                    : is_compared ? Color { .r = 200, .g = 60, .b = 180, .a = 255 }
                                                  : Color { .r = 180, .g = 160, .b = 210, .a = 255 };
 
-        DrawRectangleGradientV(static_cast<int>(side_margin + (x_step * static_cast<float>(i))),
-                               static_cast<int>(full_height - height), static_cast<int>(bar_width),
-                               static_cast<int>(height), top_color, bottom_color);
+        const float drawable_height { rect.height - (2.0f * pane_padding) };
+        const float bar_height { bar_max_pane_height * drawable_height * elements_[i] };
+        const float bar_x = rect.x + pane_padding + (x_step * static_cast<float>(i));
+        const float bar_y = rect.y + rect.height - pane_padding - bar_height;
+
+        DrawRectangleGradientV(static_cast<int>(bar_x), static_cast<int>(bar_y),
+                               static_cast<int>(bar_width), static_cast<int>(bar_height), top_color,
+                               bottom_color);
     }
-}
-
-auto SortingVisualizer::draw_title() const -> void
-{
-    const std::string name { algorithm_->name() };
-    static constexpr int font_size { 24 };
-    const int text_width { MeasureText(name.c_str(), font_size) };
-
-    DrawText(name.c_str(), (window_width - text_width) / 2, (header_height - font_size) / 2,
-             font_size, Color { .r = 230, .g = 230, .b = 230, .a = 255 });
 }
 
 auto SortingVisualizer::draw_ui() -> void
 {
-    static constexpr Rectangle play_button_bounds { .x = 30, .y = 30, .width = 75, .height = 25 };
-    if (GuiButton(play_button_bounds, paused_ ? "Play" : "Stop") != 0) paused_ = !paused_;
+    static constexpr float button_width { 75 };
+    static constexpr float button_height { 25 };
+    static constexpr float button_spacing { 10 };
 
-    static constexpr Rectangle reset_button_bounds { .x = 30, .y = 65, .width = 75, .height = 25 };
+    const float total_width = (2 * button_width) + button_spacing;
+    const float start_x = (window_width - total_width) / 2.0f;
+    const float y = (ui_top_bar_height - button_height) / 2.0f;
+
+    const Rectangle play_button_bounds {
+        .x = start_x, .y = y, .width = button_width, .height = button_height
+    };
+
+    const Rectangle reset_button_bounds { .x = start_x + button_width + button_spacing,
+                                          .y = y,
+                                          .width = button_width,
+                                          .height = button_height };
+
+    if (GuiButton(play_button_bounds, paused_ ? "Play" : "Pause") != 0) paused_ = !paused_;
     if (GuiButton(reset_button_bounds, "Reset") != 0) reset();
 
-    static constexpr Rectangle speed_multiplier_dropdown_bounds {
-        .x = 115, .y = 30, .width = 75, .height = 25
-    };
-    if (GuiDropdownBox(speed_multiplier_dropdown_bounds, "1x;5x;10x;100x", &dropdown_active_item_,
-                       dropdown_edit_mode_)
-        != 0)
-        dropdown_edit_mode_ = !dropdown_edit_mode_;
+    for (auto& pane : ui_panes_)
+    {
+        Rectangle rect = pane.rectangle;
+
+        rect.x += pane_margin;
+        rect.y += pane_margin;
+        rect.width -= 2 * pane_margin;
+        rect.height -= 2 * pane_margin;
+
+        Rectangle speed_multiplier_dropdown_bounds { .x = rect.x + (pane_padding * 2.0f),
+                                                     .y = rect.y + (pane_padding * 2.0f),
+                                                     .width = 75,
+                                                     .height = 25 };
+
+        if (GuiDropdownBox(speed_multiplier_dropdown_bounds, "1x;5x;10x;100x",
+                           &pane.speed_multiplier_idx, pane.speed_dropdown_edit_mode)
+            != 0)
+        {
+            pane.speed_dropdown_edit_mode = !pane.speed_dropdown_edit_mode;
+        }
+    }
 }
