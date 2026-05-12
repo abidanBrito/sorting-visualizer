@@ -136,6 +136,11 @@ auto SortingVisualizer::draw_pane(const Pane& pane) const -> void
 
 auto SortingVisualizer::draw_ui() -> void
 {
+    GuiSetStyle(DEFAULT, TEXT_SIZE, 14);
+    GuiSetStyle(DEFAULT, TEXT_COLOR_NORMAL, ColorToInt({ .r = 60, .g = 60, .b = 60, .a = 255 }));
+    GuiSetStyle(DEFAULT, TEXT_COLOR_FOCUSED, ColorToInt({ .r = 20, .g = 20, .b = 20, .a = 255 }));
+    GuiSetStyle(DEFAULT, TEXT_COLOR_PRESSED, ColorToInt({ .r = 10, .g = 10, .b = 10, .a = 255 }));
+
     static constexpr float button_width { 75 };
     static constexpr float button_height { 25 };
     static constexpr float button_spacing { 10 };

@@ -31,8 +31,8 @@ private:
     auto draw_ui() -> void;
     auto draw_pane(const Pane& pane) const -> void;
 
-    static constexpr int window_width { 800 };
-    static constexpr int window_height { 600 };
+    static constexpr int window_width { 1280 };
+    static constexpr int window_height { 720 };
     static constexpr int num_elements { 40 };
     static constexpr int ui_top_bar_height { 50 };
     static constexpr int pane_title_top_margin { 25 };
