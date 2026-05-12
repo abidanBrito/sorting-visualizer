@@ -69,8 +69,6 @@ auto SortingVisualizer::update() -> void
                 pane.algorithm->step(pane.elements);
         }
     }
-
-    draw_ui();
 }
 
 auto SortingVisualizer::reset() -> void
@@ -89,6 +87,8 @@ auto SortingVisualizer::draw() -> void
 
     for (auto& pane : panes_)
         draw_pane(pane);
+
+    draw_ui();
 
     EndDrawing();
 }
