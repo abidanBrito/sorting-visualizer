@@ -3,6 +3,7 @@ set(SOURCE_FILES
   visualizer.cpp
   algorithms/selection_sort.cpp
   algorithms/bubble_sort.cpp
+  algorithms/quick_sort.cpp
 )
 
 add_executable(${CMAKE_PROJECT_NAME} ${SOURCE_FILES})

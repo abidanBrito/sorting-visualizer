@@ -1,6 +1,7 @@
 #include "visualizer.hpp"
 #include "algorithms/selection_sort.hpp"
 #include "algorithms/bubble_sort.hpp"
+#include "algorithms/quick_sort.hpp"
 
 #define RAYGUI_IMPLEMENTATION
 #include <raygui.h>
@@ -13,8 +14,8 @@ SortingVisualizer::SortingVisualizer()
     panes_[1].algorithm = std::make_unique<BubbleSort>();
     panes_[2].algorithm = std::make_unique<SelectionSort>();
     panes_[3].algorithm = std::make_unique<BubbleSort>();
-    panes_[4].algorithm = std::make_unique<SelectionSort>();
     panes_[5].algorithm = std::make_unique<BubbleSort>();
+    panes_[4].algorithm = std::make_unique<QuickSort>();
 
     const float pane_width = static_cast<float>(window_width) / num_panes_per_row;
     const float pane_height = static_cast<float>(window_height - ui_top_bar_height) / num_rows;
